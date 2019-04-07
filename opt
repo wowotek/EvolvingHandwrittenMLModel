@@ -1,0 +1,20 @@
+Available Optimizer:
+    sgd
+    rmsprop
+    adagrad
+    adadelta
+    adam
+    adamax
+    nadam
+
+Available Activation:
+    tanh
+    sigmoid
+    hardsigmoid
+    exponential
+    linear
+    softmax
+    softplus
+    relu
+    elu
+    selu
