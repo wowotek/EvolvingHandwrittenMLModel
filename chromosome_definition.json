@@ -1,0 +1,44 @@
+{
+	"individuals_per_population" : 10,
+	"individual_settings" : {		
+		"optimizer" : [
+			"sgd",
+			"rmsprop",
+			"adagrad",
+			"adadelta",
+			"adam",
+			"adamax",
+			"nadam",
+			"sgd"
+		],
+		"dense_layer" : 16,
+		"epochs":{
+			"min": 3,
+			"max": 10
+		},
+		"hidden_layer_activation" : [
+			"tanh",
+			"sigmoid",
+			"exponential",
+			"linear",
+			"softmax",
+			"relu",
+			"elu",
+			"selu"
+		],
+		"output_activation" : [
+			"tanh",
+			"sigmoid",
+			"exponential",
+			"linear",
+			"softmax",
+			"relu",
+			"elu",
+			"selu"
+		],
+		"neurons":{
+			"min" : 8,
+			"max_" : 1280
+		}
+	}
+}
