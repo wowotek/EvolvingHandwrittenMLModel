@@ -60,13 +60,13 @@ class GeneticsAndNeuralNetworkUnite:
             epochs = stupidrng.integer_range(
                 definition["individual_settings"]["epochs"]["min"],
                 definition["individual_settings"]["epochs"]["max"],
-                50, verbosity
+                50, self.verbosity
             )
             self._log("]\n         | Randomizing Number of Neurons per Layer... [", end="")
             neurons_per_layer = [stupidrng.integer_range(
                 definition["individual_settings"]["neurons"]["min"],
                 definition["individual_settings"]["neurons"]["max"],
-                50, verbosity
+                50, self.verbosity
             )]
             self._log("]\n         | Random Choosing Optimization Function")
             optimizer = stupidrng.iterable_choose(definition["individual_settings"]["optimizer"])
