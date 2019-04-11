@@ -34,7 +34,7 @@ def integer_range(range_min: int, range_max: int, iteration=5, verbosity=False):
             sys.stdout.flush()
             
         random.seed(os.urandom(random.randint(range_min, range_max)))
-        return integer_range(range_min, range_max, iteration-1)
+        return integer_range(range_min, range_max, iteration-1, verbosity)
 
 def iterable_choose(iterable):
     length = len(iterable)

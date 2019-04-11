@@ -1,5 +1,6 @@
 import tensorflow as tf
 import json
+import sys
 import neural_network as wnn
 import stupidrng
 
@@ -15,12 +16,16 @@ class GeneticsAndNeuralNetworkUnite:
         "linear": tf.keras.activations.linear
     }
 
-    def __init__(self, verbosity=False):
+    def __init__(self, chromosome_definition_file: str, verbosity=False):
         self.verbosity = verbosity
+        self.definition_file = chromosome_definition_file
+        self._load_data()
+        self._generate_population()
     
-    def _log(self, string):
+    def _log(self, string, end="\n"):
         if(self.verbosity):
-            self._log(string)
+            print(string, end=end)
+            sys.stdout.flush()
 
     def _load_data(self):
         self._log("Preparing Genetics Algorithms :")
@@ -31,44 +36,45 @@ class GeneticsAndNeuralNetworkUnite:
         self._log("     - Normalizing Test Data");           self._x_test  = tf.keras.utils.normalize(self._x_test,  axis=1)
         self._log("     ...Finish!")
 
-    def _generate_population(self, chromosome_definition_file: str):
-        
-
+    def _generate_population(self):
         self._log("Generating Populations...")
         self.population = Population(self._log)
         
         self._log("    | Opening Chromosome Definition File")
-        with open(chromosome_definition_file) as f:
+        with open(self.definition_file) as f:
             definition = json.loads(f.read())
         
-        self._log("     | Generating Individuals...")
+        self._log("    | Generating Individuals...")
         for i in range(definition["individuals_per_population"]):
-            self._log("          | Randomizing Dense Layers...")
-            dense_layers = stupidrng.integer_range(0, definition["dense_layer"], 50, True)
-            self._log("          | Random Choosing Activation Layer")
+            self._log("         | Generating Individuals No. {}".format(i+1))
+            self._log("         | Randomizing Dense Layers... [", end="")
+            dense_layers = stupidrng.integer_range(0, definition["individual_settings"]["dense_layer"], 50, verbosity)
+            self._log("]\n         | Random Choosing Activation Layer")
             activation_per_layer = [
                 self._activation[stupidrng.iterable_choose(definition["individual_settings"]["hidden_layer_activation"])]\
                      for activation in range(dense_layers)
             ]
-            self._log("          | Random Choosing Output Activation")
-            output_activation = stupidrng.iterable_choose(definition["individual_settings"]["output_layer_activation"])
-            self._log("          | Randomizing Number of Epoch...")
+            self._log("         | Random Choosing Output Activation")
+            output_activation = stupidrng.iterable_choose(definition["individual_settings"]["output_activation"])
+            self._log("         | Randomizing Number of Epoch... [", end="")
             epochs = stupidrng.integer_range(
                 definition["individual_settings"]["epochs"]["min"],
-                definition["individual_settings"]["epochs"]["max"], 50
+                definition["individual_settings"]["epochs"]["max"],
+                50, verbosity
             )
-            self._log("          | Randomizing Number of Neurons per Layer...")
+            self._log("]\n         | Randomizing Number of Neurons per Layer... [", end="")
             neurons_per_layer = [stupidrng.integer_range(
                 definition["individual_settings"]["neurons"]["min"],
-                definition["individual_settings"]["max_neurons"]["max"],
-                50
+                definition["individual_settings"]["neurons"]["max"],
+                50, verbosity
             )]
-            self._log("          | Random Choosing Optimization Function")
-            optimizer = self._activation[stupidrng.iterable_choose(definition["individual_settings"]["optimizer"])]
-            self._log("          | Enlisting Individual to Population")
+            self._log("]\n         | Random Choosing Optimization Function")
+            optimizer = stupidrng.iterable_choose(definition["individual_settings"]["optimizer"])
+            self._log("         | Enlisting Individual to Population")
 
             individual = Individual(dense_layers, neurons_per_layer, activation_per_layer, output_activation, optimizer, epochs)
             self.population.add_individuals(individual)
+            self._log("         Finished !")
 
 
 class Population:
@@ -76,8 +82,8 @@ class Population:
         self._individuals = []
         self._log = log_function
     
-    def add_individuals(self, individual: Individual):
-        self._individuals.append(Individual)
+    def add_individuals(self, individual):
+        self._individuals.append(individual)
     
     def train_population(self, train_data, test_data):
         self._log("Training Individuals...")
@@ -86,7 +92,7 @@ class Population:
             i = self._individuals[individual]
             while i.loss == None or i.accuracy == None:
                 i.train(train_data, test_data)
-        self._log("Done Training !")
+        self._log("    Done Training !")
 
 class Individual:
     def __init__(self, dense_layers, neurons_per_layer, activation_per_layer, output_activation, optimizer, epochs):
